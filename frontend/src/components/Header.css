@@ -7,11 +7,37 @@
   margin-bottom: 20px;
 }
 
+.site-header__brand {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.site-header__logo-img {
+  height: 40px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.site-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .site-header__logo {
   font-size: 28px;
   font-weight: 900;
   color: #ec0016;
   letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.site-header__tagline {
+  font-size: 13px;
+  color: #9aa0a8;
+  font-weight: 400;
 }
 
 .site-header__about {
