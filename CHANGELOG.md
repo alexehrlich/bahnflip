@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/alexehrlich/bahnflip/compare/v1.0.0...v1.0.1) (2026-03-29)
+
+
+### Bug Fixes
+
+* publish pipeline ([3aee242](https://github.com/alexehrlich/bahnflip/commit/3aee242f9235ac3ec1f24d7a9b82d3368f42d4d8))
+
 # 1.0.0 (2026-03-29)
 
 
