@@ -1,5 +1,7 @@
 # https://images.ltur.com/images/pdf/bahnhofsuebersicht_fernverkehr.pdf
-FERNVERKEHR_BHFS = [
+from uuid import UUID, uuid5, NAMESPACE_DNS
+
+BHFS_LIST = [
     "Aachen Hbf",
     "Aalen Ainring",
     "Alfeld (Leine)",
@@ -51,7 +53,8 @@ FERNVERKEHR_BHFS = [
     "Boppard Hbf",
     "Brandenburg Hbf",
     "Braunschweig Hbf",
-    "Bremen Hbf Bruchsal",
+    "Bremen Hbf",
+    "Bruchsal",
     "Büchen",
     "Buchloe",
     "Bullay DB",
@@ -89,7 +92,6 @@ FERNVERKEHR_BHFS = [
     "Fischen",
     "Flensburg",
     "Forst (Lausitz)",
-    "Foto: Max Mustermann",
     "Frankfurt (Main) Flughafen",
     "Frankfurt (Main) Hbf",
     "Frankfurt (Main) Süd",
@@ -157,7 +159,6 @@ FERNVERKEHR_BHFS = [
     "Koblenz Hbf",
     "Köln/Bonn Flughafen",
     "Köln Hbf",
-    "Köln Messe/Deutz",
     "Köln Messe/Deutz",
     "Kölpinsee",
     "Konstanz",
@@ -336,3 +337,7 @@ FERNVERKEHR_BHFS = [
     "Zinnowitz",
     "Züssow",
 ]
+
+
+ID_BHF_MAP = {uuid5(NAMESPACE_DNS, bhf): bhf for bhf in BHFS_LIST}
+BHF_ID_MAP = {bhf: uuid5(NAMESPACE_DNS, bhf) for bhf in BHFS_LIST}
