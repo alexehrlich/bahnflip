@@ -14,13 +14,13 @@ class FlipView(BaseModel):
     next_train: TrainView
 
     @classmethod
-    def random(cls) -> FlipView:
-        bahnhof_view = BahnhofView(bhf_name="MockBahnhof", bhf_id="MOCK", geo_lat=0.0, geo_lon=0.0)
-        train_view = TrainView(train_name="MockTrain", delay=random.choice([-1, 5, 10, 15, 60]))  # noqa: S311
+    def random(cls, bahnhof_view: BahnhofView) -> FlipView:
+        nr = random.randint(0, 999)  # noqa: S311
+        train_view = TrainView(train_name=f"MockTrain ICE-{nr}", delay=random.choice([-1, 5, 10, 15, 60]))  # noqa: S311
         return FlipView(bahnhof=bahnhof_view, next_train=train_view)
 
 
-def __mock_flip() -> FlipView:
+def __mock_flip(bahnhof_view: BahnhofView) -> FlipView:
     r = random.random()  # noqa: S311
     if r < 0.1:
         _err = random.choice([0, 1])  # noqa: S311
@@ -28,15 +28,11 @@ def __mock_flip() -> FlipView:
             raise HTTPException(status_code=404, detail="Mocking 404")
         if _err == 1:
             raise HTTPException(status_code=500, detail="Mocking 500")
-    return FlipView.random()
+    return FlipView.random(bahnhof_view)
 
 
 @app.get("/flip")
 def perform_flip(bahnhof: str | None = None) -> FlipView:
-
-    # Mocking
-    if HEADERS["DB-Client-Id"] == "PLACEHOLDER" or HEADERS["DB-Api-Key"] == "PLACEHOLDER":
-        return __mock_flip()
 
     bahnhof_view = None
     if bahnhof is None:
@@ -45,8 +41,13 @@ def perform_flip(bahnhof: str | None = None) -> FlipView:
         bahnhof_view = ID_MAP.get(bahnhof)
     elif bahnhof in NAME_LIST:
         bahnhof_view = NAME_MAP.get(bahnhof)
+
     if bahnhof_view is None:
         raise HTTPException(status_code=404, detail=f"Bahnhof '{bahnhof}' not found!")
+
+    # Mocking
+    if HEADERS["DB-Client-Id"] == "PLACEHOLDER" or HEADERS["DB-Api-Key"] == "PLACEHOLDER":
+        return __mock_flip(bahnhof_view)
 
     get_latest_train(bahnhof_view.bhf_id)
 
