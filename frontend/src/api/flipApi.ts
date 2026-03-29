@@ -1,9 +1,19 @@
 import type { FlipResult } from "../types/viewmodels";
 
-export async function fetchFlip(stationName: string): Promise<FlipResult> {
-  const response = await fetch(`/api/flip?bahnhof=${encodeURIComponent(stationName)}`);
+export class FlipServerError extends Error {
+  constructor(message = "Could not retrieve train data") {
+    super(message);
+    this.name = "FlipServerError";
+  }
+}
+
+export async function fetchFlip(stationId: string): Promise<FlipResult> {
+  const response = await fetch(`/api/flip?bahnhof=${encodeURIComponent(stationId)}`);
+  if (response.status === 500) {
+    throw new FlipServerError();
+  }
   if (!response.ok) {
-    throw new Error(`Failed to fetch flip: ${response.status}`);
+    throw new Error(`Unexpected error: ${response.status}`);
   }
   return response.json();
 }

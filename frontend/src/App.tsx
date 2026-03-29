@@ -1,50 +1,122 @@
-import { useState, useEffect } from "react";
-import { StationInput } from "./components/StationInput";
+import { useState, useEffect, useRef } from "react";
+import { FlipResultCards } from "./components/FlipResultCards";
+import type { CardState } from "./components/FlipResultCards";
+import { MapSearchOverlay } from "./components/MapSearchOverlay";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
+import { AboutPage } from "./pages/AboutPage";
 import { fetchStations } from "./api/stationsApi";
-import { fetchFlip } from "./api/flipApi";
-import type { FlipResult, Station } from "./types/viewmodels";
+import type { Station } from "./types/viewmodels";
+import "leaflet/dist/leaflet.css";
+import { GermanyMap } from "./components/GermanyGeoMap";
+import "./App.css";
+
+function mockCard(station: Station): CardState {
+  const roll = Math.random();
+
+  if (roll < 0.1) {
+    // 10 %: server error
+    return { station, result: null, error: "Could not retrieve train data", flipped: false };
+  }
+
+  if (roll < 0.25) {
+    // 15 %: cancelled  (delay === -1)
+    return {
+      station,
+      result: {
+        bahnhof: station,
+        next_train: {
+          train_name: `ICE ${Math.floor(Math.random() * 900) + 100}`,
+          train_id: `mock-${Date.now()}`,
+          delay: -1,
+        },
+      },
+      error: null,
+      flipped: false,
+    };
+  }
+
+  const isDelayed = roll < 0.6; // 35 % delayed, 40 % on time
+  return {
+    station,
+    result: {
+      bahnhof: station,
+      next_train: {
+        train_name: `ICE ${Math.floor(Math.random() * 900) + 100}`,
+        train_id: `mock-${Date.now()}`,
+        delay: isDelayed ? Math.floor(Math.random() * 15) + 1 : 0,
+      },
+    },
+    error: null,
+    flipped: false,
+  };
+}
 
 function App() {
+  const [page, setPage] = useState<"home" | "about">("home");
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
   const [stations, setStations] = useState<Station[]>([]);
-  const [flipResult, setFlipResult] = useState<FlipResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [cards, setCards] = useState<CardState[]>([]);
+  const [overlayDismissed, setOverlayDismissed] = useState(false);
+  const skipFlyRef = useRef(false);
 
   useEffect(() => {
     fetchStations().then(setStations).catch(console.error);
   }, []);
 
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
+  useEffect(() => {
     if (!selectedStation) return;
-    setError(null);
-    setFlipResult(null);
-    try {
-      const result = await fetchFlip(selectedStation.bhf_name);
-      setFlipResult(result);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-    }
+    const newCard = mockCard(selectedStation);
+    setCards((prev) => [newCard, ...prev.filter((c) => c.flipped)]);
+    setOverlayDismissed(false);
+  }, [selectedStation]);
+
+  function handleFlip(trainId: string) {
+    setCards((prev) =>
+      prev.map((c) =>
+        (c.result?.next_train.train_id ?? `error-${c.station.bhf_id}`) === trainId
+          ? { ...c, flipped: true }
+          : c,
+      ),
+    );
   }
 
+  const latestCard = cards[0] ?? null;
+  const showMobileOverlay = latestCard !== null && !overlayDismissed;
+
   return (
-    <main>
-      <h1>bahnflip</h1>
-      <form onSubmit={handleSearch}>
-        <StationInput
-          label="Station"
-          selected={selectedStation}
-          stations={stations}
-          onSelect={setSelectedStation}
-        />
-        <button type="submit" disabled={!selectedStation}>
-          Search
-        </button>
-      </form>
-      {error && <p>{error}</p>}
-      {flipResult && <p>Result: {flipResult.bahnhof.bhf_name}</p>}
-      {/* <NetworkMap stations={stations} selected={selectedStation} onSelect={setSelectedStation} /> */}
-    </main>
+    <>
+      <Header onAboutClick={() => setPage("about")} />
+      {page === "about" ? (
+        <AboutPage onBack={() => setPage("home")} />
+      ) : (
+        <div className="app-layout">
+          <div className="app-map">
+            <GermanyMap
+              stations={stations}
+              selected={selectedStation}
+              onSelect={setSelectedStation}
+              skipFlyRef={skipFlyRef}
+              onMapClick={() => setOverlayDismissed(true)}
+            />
+            <MapSearchOverlay
+              stations={stations}
+              selected={selectedStation}
+              onSelect={setSelectedStation}
+            />
+            {showMobileOverlay && (
+              <div className="mobile-card-overlay" onClick={(e) => e.stopPropagation()}>
+                <FlipResultCards cards={[latestCard]} onFlip={handleFlip} />
+              </div>
+            )}
+          </div>
+          <div className="app-right">
+            <FlipResultCards cards={cards} onFlip={handleFlip} />
+          </div>
+        </div>
+      )}
+      <Footer />
+    </>
   );
 }
 

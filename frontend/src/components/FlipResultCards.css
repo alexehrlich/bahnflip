@@ -1,0 +1,211 @@
+.flip-history {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Empty state ─────────────────────────── */
+
+.flip-history--empty {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 32px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.flip-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.flip-empty__coin {
+  width: 60px;
+  height: 60px;
+  background: #ec0016;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: coin-idle 2.8s ease-in-out infinite;
+  box-shadow: 0 4px 16px rgba(236, 0, 22, 0.3);
+}
+
+@keyframes coin-idle {
+  0%, 100% { transform: rotateY(0deg); }
+  30%       { transform: rotateY(65deg); }
+  70%       { transform: rotateY(-65deg); }
+}
+
+.flip-empty__text {
+  font-size: 13px;
+  color: #9aa0a8;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── Shared card base ────────────────────── */
+
+.flip-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  border-left: 5px solid transparent;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Pending card (red, unflipped) ───────── */
+
+.flip-card--pending {
+  background: #ec0016;
+  border-left-color: #c50014;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  user-select: none;
+}
+
+.flip-card--pending:hover {
+  background: #c50014;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(236, 0, 22, 0.3);
+}
+
+/* Pending: override all text colours to white */
+.flip-card--pending .flip-card__station {
+  color: #ffffff;
+}
+
+.flip-card--pending .flip-card__hint {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.04em;
+  margin-left: auto;
+}
+
+/* Badge blurred on pending face */
+.flip-card__status-badge--blurred {
+  filter: blur(5px);
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Train name blurred on pending face */
+.flip-card__train--blurred {
+  filter: blur(5px);
+  color: rgba(255, 255, 255, 0.75) !important;
+  user-select: none;
+}
+
+/* ── Result variants ──────────────────────── */
+
+.flip-card--on-time   { border-left-color: #00a861; }
+.flip-card--delayed   { border-left-color: #ec0016; }
+.flip-card--cancelled { border-left-color: #646973; }
+.flip-card--error     { border-left-color: #f0a500; }
+
+.flip-card--latest {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.flip-card--history {
+  opacity: 0.55;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Result card content ──────────────────── */
+
+.flip-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.flip-card__status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.flip-card--on-time .flip-card__status-badge {
+  background: #e6f7f0;
+  color: #00733f;
+}
+
+.flip-card--delayed .flip-card__status-badge {
+  background: #fde8ea;
+  color: #c50014;
+}
+
+.flip-card--cancelled .flip-card__status-badge {
+  background: #ebebeb;
+  color: #3d4145;
+  text-decoration: line-through;
+}
+
+.flip-card--error .flip-card__status-badge {
+  background: #fff4d6;
+  color: #8a5c00;
+}
+
+.flip-card__delay {
+  font-size: 13px;
+  color: #646973;
+  margin-left: auto;
+}
+
+.flip-card__station {
+  font-size: 15px;
+  font-weight: 700;
+  color: #131821;
+  margin-bottom: 3px;
+}
+
+.flip-card__train {
+  font-size: 13px;
+  color: #646973;
+}
+
+/* ── 3D flip container ────────────────────── */
+
+.flip-card-3d {
+  perspective: 900px;
+  /* height is set inline from measured cardHeight */
+}
+
+.flip-card-3d__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: card-flip 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes card-flip {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(-180deg); }
+}
+
+.flip-card-3d__front,
+.flip-card-3d__back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 12px;
+}
+
+.flip-card-3d__back {
+  transform: rotateY(180deg);
+}

@@ -1,0 +1,182 @@
+import { useState, useRef } from "react";
+import type { FlipResult } from "../types/viewmodels";
+import type { Station } from "../types/viewmodels";
+import "./FlipResultCards.css";
+
+export interface CardState {
+  station: Station;
+  result: FlipResult | null; // null when server error
+  error: string | null;      // set when server error
+  flipped: boolean;
+}
+
+interface Props {
+  cards: CardState[];
+  onFlip: (trainId: string) => void;
+}
+
+export function FlipResultCards({ cards, onFlip }: Props) {
+  if (cards.length === 0) {
+    return (
+      <div className="flip-history flip-history--empty">
+        <div className="flip-empty">
+          <div className="flip-empty__coin">?</div>
+          <p className="flip-empty__text">Select a station on the map to flip</p>
+        </div>
+      </div>
+    );
+  }
+
+  const firstFlippedIdx = cards.findIndex((c) => c.flipped);
+
+  return (
+    <div className="flip-history">
+      {cards.map((card, i) => (
+        <FlipCard
+          key={card.result?.next_train.train_id ?? `error-${card.station.bhf_id}`}
+          card={card}
+          onFlip={() => onFlip(card.result?.next_train.train_id ?? `error-${card.station.bhf_id}`)}
+          isLatestFlipped={card.flipped && i === firstFlippedIdx}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ── Resolve card variant ───────────────────────────────────────
+type CardVariant = "on-time" | "delayed" | "cancelled" | "error";
+
+function resolveVariant(card: CardState): CardVariant {
+  if (card.error) return "error";
+  const delay = card.result!.next_train.delay;
+  if (delay === -1) return "cancelled";
+  if (delay > 0) return "delayed";
+  return "on-time";
+}
+
+// ── FlipCard container ─────────────────────────────────────────
+function FlipCard({
+  card,
+  onFlip,
+  isLatestFlipped,
+}: {
+  card: CardState;
+  onFlip: () => void;
+  isLatestFlipped: boolean;
+}) {
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const [cardHeight, setCardHeight] = useState(100);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const variant = resolveVariant(card);
+
+  function handleClick() {
+    setCardHeight(cardRef.current?.offsetHeight ?? 100);
+    onFlip();
+  }
+
+  // ── Pending ────────────────────────────────────────
+  if (!card.flipped) {
+    return (
+      <div ref={cardRef} className="flip-card flip-card--pending" onClick={handleClick}>
+        <PendingCardContent card={card} />
+      </div>
+    );
+  }
+
+  // ── Animating ──────────────────────────────────────
+  if (!hasAnimated) {
+    return (
+      <div className="flip-card-3d" style={{ height: cardHeight }}>
+        <div className="flip-card-3d__inner" onAnimationEnd={() => setHasAnimated(true)}>
+          <div className="flip-card-3d__front flip-card flip-card--pending">
+            <PendingCardContent card={card} />
+          </div>
+          <div className={`flip-card-3d__back flip-card flip-card--${variant}`}>
+            <ResultCardContent card={card} variant={variant} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Settled ────────────────────────────────────────
+  return (
+    <div
+      className={[
+        "flip-card",
+        `flip-card--${variant}`,
+        isLatestFlipped ? "flip-card--latest" : "flip-card--history",
+      ].join(" ")}
+    >
+      <ResultCardContent card={card} variant={variant} />
+    </div>
+  );
+}
+
+// ── Pending face: same layout as result, badge + train blurred ─
+function PendingCardContent({ card }: { card: CardState }) {
+  const badgeLabel = card.result
+    ? card.result.next_train.delay > 0
+      ? "Delayed"
+      : "On Time"
+    : "●●●";
+  const trainLabel = card.result?.next_train.train_name ?? "ICE ●●●";
+
+  return (
+    <>
+      <div className="flip-card__header">
+        <span className="flip-card__status-badge flip-card__status-badge--blurred">
+          {badgeLabel}
+        </span>
+        <span className="flip-card__hint">tap to flip ↵</span>
+      </div>
+      <div className="flip-card__station">{card.station.bhf_name}</div>
+      <div className="flip-card__train flip-card__train--blurred">{trainLabel}</div>
+    </>
+  );
+}
+
+// ── Result face ────────────────────────────────────────────────
+function ResultCardContent({ card, variant }: { card: CardState; variant: CardVariant }) {
+  if (variant === "error") {
+    return (
+      <>
+        <div className="flip-card__header">
+          <span className="flip-card__status-badge">No data</span>
+        </div>
+        <div className="flip-card__station">{card.station.bhf_name}</div>
+        <div className="flip-card__train">{card.error}</div>
+      </>
+    );
+  }
+
+  const result = card.result!;
+  const { delay, train_name } = result.next_train;
+
+  if (variant === "cancelled") {
+    return (
+      <>
+        <div className="flip-card__header">
+          <span className="flip-card__status-badge">Cancelled</span>
+        </div>
+        <div className="flip-card__station">{result.bahnhof.bhf_name}</div>
+        <div className="flip-card__train">{train_name}</div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="flip-card__header">
+        <span className="flip-card__status-badge">
+          {variant === "delayed" ? "Delayed" : "On Time"}
+        </span>
+        {variant === "delayed" && (
+          <span className="flip-card__delay">+{delay} min</span>
+        )}
+      </div>
+      <div className="flip-card__station">{result.bahnhof.bhf_name}</div>
+      <div className="flip-card__train">{train_name}</div>
+    </>
+  );
+}
