@@ -50,7 +50,10 @@ def perform_flip(bahnhof: str | None = None) -> FlipView:
     if HEADERS["DB-Client-Id"] == "PLACEHOLDER" or HEADERS["DB-Api-Key"] == "PLACEHOLDER":
         return __mock_flip(bahnhof_view)
 
-    train_view = get_latest_train(bahnhof_view.bhf_id)
+    try:
+        train_view = get_latest_train(bahnhof_view.bhf_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
     return FlipView(bahnhof=bahnhof_view, next_train=train_view)
 
 
