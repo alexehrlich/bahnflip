@@ -16,16 +16,18 @@ class FlipView(BaseModel):
     @classmethod
     def random(cls) -> FlipView:
         bahnhof_view = BahnhofView(bhf_name="MockBahnhof", bhf_id="MOCK", geo_lat=0.0, geo_lon=0.0)
-        train_view = TrainView(train_name="MockTrain", delay=random.choice([-1, 5, 10, 15]))  # noqa: S311
+        train_view = TrainView(train_name="MockTrain", delay=random.choice([-1, 5, 10, 15, 60]))  # noqa: S311
         return FlipView(bahnhof=bahnhof_view, next_train=train_view)
 
 
 def __mock_flip() -> FlipView:
-    _func = random.choice([0, 1, 2])  # noqa: S311
-    if _func == 1:
-        raise HTTPException(status_code=404, detail="Mocking 404")
-    if _func == 2:
-        raise HTTPException(status_code=500, detail="Mocking 500")
+    r = random.random()  # noqa: S311
+    if r < 0.1:
+        _err = random.choice([0, 1])  # noqa: S311
+        if _err == 0:
+            raise HTTPException(status_code=404, detail="Mocking 404")
+        if _err == 1:
+            raise HTTPException(status_code=500, detail="Mocking 500")
     return FlipView.random()
 
 
