@@ -24,8 +24,8 @@ class BahnhofView(BaseModel):
 
 BHF_LIST =[
     BahnhofView(bhf_id="AA", bhf_name="Hamburg-Altona", geo_lat=53.55657, geo_lon=9.93598),
-    BahnhofView(bhf_id="AH", bhf_name="Hamburg Hbf", geo_lat=53.54739, geo_lon=10.00916),
     BahnhofView(bhf_id="AHAR", bhf_name="Hamburg-Harburg", geo_lat=53.45569, geo_lon=9.99083),
+    BahnhofView(bhf_id="AH", bhf_name="Hamburg Hbf", geo_lat=53.54739, geo_lon=10.00916),
     BahnhofView(bhf_id="BFBI", bhf_name="Flughafen BER", geo_lat=52.36319, geo_lon=13.44924),
     BahnhofView(bhf_id="BFRI", bhf_name="Berlin Friedrichstraße", geo_lat=52.52059, geo_lon=13.38692),
     BahnhofView(bhf_id="BGS", bhf_name="Berlin-Gesundbrunnen", geo_lat=52.54883, geo_lon=13.39886),
@@ -34,8 +34,8 @@ BHF_LIST =[
     BahnhofView(bhf_id="BLO", bhf_name="Berlin-Lichtenberg", geo_lat=52.50967, geo_lon=13.49653),
     BahnhofView(bhf_id="BOKR", bhf_name="Berlin Ostkreuz (Stadtbahn-F)", geo_lat=52.51066, geo_lon=13.43350),
     BahnhofView(bhf_id="BPAF", bhf_name="Berlin Südkreuz", geo_lat=52.47607, geo_lon=13.36617),
-    BahnhofView(bhf_id="BSPD", bhf_name="Berlin-Spandau", geo_lat=52.52974, geo_lon=13.22396),
     BahnhofView(bhf_id="BPD", bhf_name="Potsdam Hbf", geo_lat=52.39154, geo_lon=13.06670),
+    BahnhofView(bhf_id="BSPD", bhf_name="Berlin-Spandau", geo_lat=52.52974, geo_lon=13.22396),
     BahnhofView(bhf_id="BZOO", bhf_name="Berlin Zoologischer Garten", geo_lat=52.50868, geo_lon=13.33343),
     BahnhofView(bhf_id="EDG", bhf_name="Duisburg Hbf", geo_lat=51.41184, geo_lon=6.77521),
     BahnhofView(bhf_id="EDO", bhf_name="Dortmund Hbf", geo_lat=51.51797, geo_lon=7.45926),
@@ -55,8 +55,8 @@ BHF_LIST =[
     BahnhofView(bhf_id="MP", bhf_name="München-Pasing", geo_lat=48.15185, geo_lon=11.44889),
     BahnhofView(bhf_id="NN", bhf_name="Nürnberg Hbf", geo_lat=49.44956, geo_lon=11.10960),
     BahnhofView(bhf_id="RF", bhf_name="Freiburg (Breisgau) Hbf", geo_lat=47.99709, geo_lon=7.83991),
-    BahnhofView(bhf_id="RK", bhf_name="Karlsruhe Hbf", geo_lat=48.99192, geo_lon=8.39826),
     BahnhofView(bhf_id="RKAB", bhf_name="Karlsruhe Albtalbahnhof", geo_lat=48.99170, geo_lon=8.39481),
+    BahnhofView(bhf_id="RK", bhf_name="Karlsruhe Hbf", geo_lat=48.99192, geo_lon=8.39826),
     BahnhofView(bhf_id="RM", bhf_name="Mannheim Hbf", geo_lat=49.47944, geo_lon=8.46958),
     BahnhofView(bhf_id="TS", bhf_name="Stuttgart Hbf", geo_lat=48.78751, geo_lon=9.18642),
 ]
@@ -65,3 +65,4 @@ BHF_LIST =[
 ID_MAP = {b.bhf_id: b for b in BHF_LIST}
 ID_LIST = [b.bhf_id for b in BHF_LIST]
 NAME_MAP = {b.bhf_name: b for b in BHF_LIST}
+NAME_LIST = [b.bhf_name for b in BHF_LIST]
