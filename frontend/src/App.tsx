@@ -45,11 +45,7 @@ function App() {
       </form>
       {error && <p>{error}</p>}
       {flipResult && <p>Result: {flipResult.Bahnhof}</p>}
-      <NetworkMap
-        stations={stations}
-        selected={selectedStation}
-        onSelect={setSelectedStation}
-      />
+      <NetworkMap stations={stations} selected={selectedStation} onSelect={setSelectedStation} />
     </main>
   );
 }
