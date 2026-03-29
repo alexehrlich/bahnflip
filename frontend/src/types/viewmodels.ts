@@ -1,4 +1,4 @@
-import type { components } from "../api/types";
+import type { components } from "./types";
 
 export type Station = components["schemas"]["BahnhofView"];
 

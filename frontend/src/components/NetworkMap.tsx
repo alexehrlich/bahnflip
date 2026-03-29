@@ -23,7 +23,7 @@ function labelOffset(anchor?: string): [number, number, string] {
 
 export function NetworkMap({ stations, selected, onSelect }: Props) {
   // Map station name → Station object for lookup by map node id (which is the name)
-  const availableByName = new Map(stations.map((s) => [s.name, s]));
+  const availableByName = new Map(stations.map((s) => [s.bhf_name, s]));
 
   return (
     <svg
@@ -61,7 +61,7 @@ export function NetworkMap({ stations, selected, onSelect }: Props) {
       {/* Station markers + labels */}
       {MAP_STATIONS.map((mapStation) => {
         const backendStation = availableByName.get(mapStation.id);
-        const isSelected = selected?.name === mapStation.id;
+        const isSelected = selected?.bhf_name === mapStation.id;
         const isAvailable = backendStation !== undefined;
         const markerColor = isSelected ? "#0055cc" : isAvailable ? "#cc0000" : "#999999";
         const [dx, dy, anchor] = labelOffset(mapStation.anchor);
