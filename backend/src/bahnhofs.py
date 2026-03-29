@@ -92,7 +92,6 @@ BHFS_LIST = [
     "Fischen",
     "Flensburg",
     "Forst (Lausitz)",
-    "Foto: Max Mustermann",
     "Frankfurt (Main) Flughafen",
     "Frankfurt (Main) Hbf",
     "Frankfurt (Main) Süd",
