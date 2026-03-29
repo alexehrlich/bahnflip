@@ -21,3 +21,9 @@ frontend/.vite/
 .DS_Store
 *.suo
 *.sw?
+
+
+# Python
+__pycache__
+uv.lock
+.python-version
