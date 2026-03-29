@@ -2,19 +2,31 @@ import { useState, useEffect } from "react";
 import { StationInput } from "./components/StationInput";
 import { NetworkMap } from "./components/NetworkMap";
 import { fetchStations } from "./api/stationsApi";
+import { fetchFlip } from "./api/flipApi";
+import type { FlipResult } from "./api/flipApi";
+import type { Station } from "./types/station";
 
 function App() {
-  const [station, setStation] = useState("");
-  const [stations, setStations] = useState<string[]>([]);
+  const [selectedStation, setSelectedStation] = useState<Station | null>(null);
+  const [stations, setStations] = useState<Station[]>([]);
+  const [flipResult, setFlipResult] = useState<FlipResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchStations().then(setStations).catch(console.error);
   }, []);
 
-  function handleSearch(e: React.FormEvent) {
+  async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    // TODO: fetch departures for `station` from backend
-    console.log("searching for:", station);
+    if (!selectedStation) return;
+    setError(null);
+    setFlipResult(null);
+    try {
+      const result = await fetchFlip(selectedStation.name);
+      setFlipResult(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    }
   }
 
   return (
@@ -23,13 +35,21 @@ function App() {
       <form onSubmit={handleSearch}>
         <StationInput
           label="Station"
-          value={station}
+          selected={selectedStation}
           stations={stations}
-          onChange={setStation}
+          onSelect={setSelectedStation}
         />
-        <button type="submit">Search</button>
+        <button type="submit" disabled={!selectedStation}>
+          Search
+        </button>
       </form>
-      <NetworkMap stations={stations} selected={station} onSelect={setStation} />
+      {error && <p>{error}</p>}
+      {flipResult && <p>Result: {flipResult.Bahnhof}</p>}
+      <NetworkMap
+        stations={stations}
+        selected={selectedStation}
+        onSelect={setSelectedStation}
+      />
     </main>
   );
 }

@@ -1,10 +1,11 @@
 import { MAP_STATIONS, MAP_EDGES } from "../data/networkMap";
 import { GERMANY_BORDER_PATH } from "../data/germanyBorder";
+import type { Station } from "../types/station";
 
 interface Props {
-  stations: string[];
-  selected: string;
-  onSelect: (station: string) => void;
+  stations: Station[];
+  selected: Station | null;
+  onSelect: (station: Station) => void;
 }
 
 function labelOffset(anchor?: string): [number, number, string] {
@@ -21,7 +22,8 @@ function labelOffset(anchor?: string): [number, number, string] {
 }
 
 export function NetworkMap({ stations, selected, onSelect }: Props) {
-  const available = new Set(stations);
+  // Map station name → Station object for lookup by map node id (which is the name)
+  const availableByName = new Map(stations.map((s) => [s.name, s]));
 
   return (
     <svg
@@ -57,37 +59,38 @@ export function NetworkMap({ stations, selected, onSelect }: Props) {
       })}
 
       {/* Station markers + labels */}
-      {MAP_STATIONS.map((station) => {
-        const isSelected = station.id === selected;
-        const isAvailable = available.has(station.id);
+      {MAP_STATIONS.map((mapStation) => {
+        const backendStation = availableByName.get(mapStation.id);
+        const isSelected = selected?.name === mapStation.id;
+        const isAvailable = backendStation !== undefined;
         const markerColor = isSelected
           ? "#0055cc"
           : isAvailable
             ? "#cc0000"
             : "#999999";
-        const [dx, dy, anchor] = labelOffset(station.anchor);
+        const [dx, dy, anchor] = labelOffset(mapStation.anchor);
 
         return (
           <g
-            key={station.id}
-            onClick={() => isAvailable && onSelect(station.id)}
+            key={mapStation.id}
+            onClick={() => backendStation && onSelect(backendStation)}
             style={{ cursor: isAvailable ? "pointer" : "default" }}
           >
-            {station.type === "interchange" ? (
+            {mapStation.type === "interchange" ? (
               <rect
-                x={station.x - 4.5}
-                y={station.y - 4.5}
+                x={mapStation.x - 4.5}
+                y={mapStation.y - 4.5}
                 width={9}
                 height={9}
-                transform={`rotate(45,${station.x},${station.y})`}
+                transform={`rotate(45,${mapStation.x},${mapStation.y})`}
                 fill={isSelected ? markerColor : "white"}
                 stroke={markerColor}
                 strokeWidth={isSelected ? 2 : 1.5}
               />
             ) : (
               <circle
-                cx={station.x}
-                cy={station.y}
+                cx={mapStation.x}
+                cy={mapStation.y}
                 r={isSelected ? 5.5 : 4}
                 fill={isSelected ? markerColor : "white"}
                 stroke={markerColor}
@@ -95,15 +98,15 @@ export function NetworkMap({ stations, selected, onSelect }: Props) {
               />
             )}
             <text
-              x={station.x + dx}
-              y={station.y + dy}
+              x={mapStation.x + dx}
+              y={mapStation.y + dy}
               fontSize={8}
               textAnchor={anchor}
               fill={isSelected ? markerColor : "#222222"}
               fontWeight={isSelected ? "bold" : "normal"}
               style={{ pointerEvents: "none", userSelect: "none" }}
             >
-              {station.id}
+              {mapStation.id}
             </text>
           </g>
         );
