@@ -5,6 +5,13 @@
   width: 100%;
   max-width: 1200px;
   margin-bottom: 20px;
+  padding: 0 4px;
+}
+
+@media (max-width: 768px) {
+  .site-header__tagline {
+    display: none;
+  }
 }
 
 .site-header__brand {

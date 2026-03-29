@@ -18,6 +18,7 @@ interface Props {
   selected?: Station | null;
   onSelect: (station: Station) => void;
   skipFlyRef: React.MutableRefObject<boolean>;
+  onMapClick?: () => void;
 }
 
 const GERMANY_CENTER: LatLngExpression = [51.2, 10.5];
@@ -31,7 +32,6 @@ function MapUpdater({
   skipFlyRef: React.MutableRefObject<boolean>;
 }) {
   const map = useMap();
-
   useEffect(() => {
     if (!selected) return;
     if (skipFlyRef.current) {
@@ -40,7 +40,6 @@ function MapUpdater({
     }
     map.flyTo([selected.geo_lat, selected.geo_lon], 10, { duration: 1.5 });
   }, [selected, map, skipFlyRef]);
-
   return null;
 }
 
@@ -52,7 +51,16 @@ function MapCapture({ mapRef }: { mapRef: React.MutableRefObject<LeafletMap | nu
   return null;
 }
 
-export function GermanyMap({ stations, selected, onSelect, skipFlyRef }: Props) {
+function MapClickHandler({ onClick }: { onClick: () => void }) {
+  const map = useMap();
+  useEffect(() => {
+    map.on("click", onClick);
+    return () => { map.off("click", onClick); };
+  }, [map, onClick]);
+  return null;
+}
+
+export function GermanyMap({ stations, selected, onSelect, skipFlyRef, onMapClick }: Props) {
   const mapRef = useRef<LeafletMap | null>(null);
 
   const geoJsonStyle = () => ({
@@ -62,7 +70,7 @@ export function GermanyMap({ stations, selected, onSelect, skipFlyRef }: Props) 
   });
 
   return (
-    <div style={{ position: "relative", height: "600px", width: "100%" }}>
+    <div className="germany-map-wrap" style={{ width: "100%" }}>
       <MapContainer
         center={GERMANY_CENTER}
         zoom={DEFAULT_ZOOM}
@@ -96,7 +104,9 @@ export function GermanyMap({ stations, selected, onSelect, skipFlyRef }: Props) 
                   !isSelected && e.target.setStyle({ fillColor: "#EC0016", fillOpacity: 0.35 }),
                 mouseout: (e) =>
                   !isSelected && e.target.setStyle({ fillColor: "#ffffff", fillOpacity: 1 }),
-                click: () => {
+                click: (e) => {
+                  // Stop propagation so the map's click event doesn't also fire
+                  e.originalEvent.stopPropagation();
                   skipFlyRef.current = true;
                   onSelect(s);
                 },
@@ -113,6 +123,7 @@ export function GermanyMap({ stations, selected, onSelect, skipFlyRef }: Props) 
         <MapUpdater selected={selected} skipFlyRef={skipFlyRef} />
         <MapCapture mapRef={mapRef} />
         <AttributionControl position="topright" />
+        {onMapClick && <MapClickHandler onClick={onMapClick} />}
       </MapContainer>
 
       <div

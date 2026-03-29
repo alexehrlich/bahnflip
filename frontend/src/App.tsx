@@ -16,6 +16,7 @@ function App() {
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
   const [stations, setStations] = useState<Station[]>([]);
   const [cards, setCards] = useState<CardState[]>([]);
+  const [overlayDismissed, setOverlayDismissed] = useState(false);
   const skipFlyRef = useRef(false);
 
   useEffect(() => {
@@ -39,10 +40,10 @@ function App() {
     };
 
     setCards((prev) => {
-      // Overwrite any existing unflipped card; keep all flipped ones
       const flippedOnly = prev.filter((c) => c.flipped);
       return [newCard, ...flippedOnly];
     });
+    setOverlayDismissed(false);
   }, [selectedStation]);
 
   function handleFlip(trainId: string) {
@@ -52,6 +53,9 @@ function App() {
       ),
     );
   }
+
+  const latestCard = cards[0] ?? null;
+  const showMobileOverlay = latestCard !== null && !overlayDismissed;
 
   return (
     <>
@@ -66,12 +70,24 @@ function App() {
               selected={selectedStation}
               onSelect={setSelectedStation}
               skipFlyRef={skipFlyRef}
+              onMapClick={() => setOverlayDismissed(true)}
             />
             <MapSearchOverlay
               stations={stations}
               selected={selectedStation}
               onSelect={setSelectedStation}
             />
+            {showMobileOverlay && (
+              <div
+                className="mobile-card-overlay"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <FlipResultCards
+                  cards={[latestCard]}
+                  onFlip={handleFlip}
+                />
+              </div>
+            )}
           </div>
           <div className="app-right">
             <FlipResultCards cards={cards} onFlip={handleFlip} />
