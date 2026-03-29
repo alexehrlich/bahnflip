@@ -67,6 +67,7 @@ function App() {
   useEffect(() => {
     if (!selectedStation) return;
     const newCard = mockCard(selectedStation);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCards((prev) => [newCard, ...prev.filter((c) => c.flipped)]);
     setOverlayDismissed(false);
   }, [selectedStation]);

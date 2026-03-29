@@ -31,6 +31,7 @@ export function StationInput({
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInputValue(selected?.bhf_name ?? "");
   }, [selected]);
 
