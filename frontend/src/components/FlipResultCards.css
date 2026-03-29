@@ -1,0 +1,82 @@
+.flip-history {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.flip-history--empty {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  color: #646973;
+  font-size: 14px;
+}
+
+.flip-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  border-left: 5px solid transparent;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.flip-card--latest {
+  opacity: 1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.flip-card--on-time {
+  border-left-color: #00a861;
+}
+
+.flip-card--delayed {
+  border-left-color: #ec0016;
+}
+
+.flip-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.flip-card__status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.flip-card--on-time .flip-card__status-badge {
+  background: #e6f7f0;
+  color: #00733f;
+}
+
+.flip-card--delayed .flip-card__status-badge {
+  background: #fde8ea;
+  color: #c50014;
+}
+
+.flip-card__delay {
+  font-size: 13px;
+  color: #646973;
+  margin-left: auto;
+}
+
+.flip-card__station {
+  font-size: 15px;
+  font-weight: 700;
+  color: #131821;
+  margin-bottom: 3px;
+}
+
+.flip-card__train {
+  font-size: 13px;
+  color: #646973;
+}

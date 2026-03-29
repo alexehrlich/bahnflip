@@ -1,57 +1,68 @@
-import { useState, useEffect } from "react";
-import { StationInput } from "./components/StationInput";
+import { useState, useEffect, useRef } from "react";
+import { FlipResultCards } from "./components/FlipResultCards";
+import { MapSearchOverlay } from "./components/MapSearchOverlay";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
+import { AboutPage } from "./pages/AboutPage";
 import { fetchStations } from "./api/stationsApi";
-import { fetchFlip } from "./api/flipApi";
 import type { FlipResult, Station } from "./types/viewmodels";
 import "leaflet/dist/leaflet.css";
 import { GermanyMap } from "./components/GermanyGeoMap";
+import "./App.css";
 
 function App() {
+  const [page, setPage] = useState<"home" | "about">("home");
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
   const [stations, setStations] = useState<Station[]>([]);
-  const [flipResult, setFlipResult] = useState<FlipResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<FlipResult[]>([]);
+  const skipFlyRef = useRef(false);
 
   useEffect(() => {
     fetchStations().then(setStations).catch(console.error);
   }, []);
 
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
+  useEffect(() => {
     if (!selectedStation) return;
-    setError(null);
-    setFlipResult(null);
-    try {
-      const result = await fetchFlip(selectedStation.bhf_id);
-      setFlipResult(result);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
-    }
-  }
+
+    const isDelayed = Math.random() > 0.5;
+    const result: FlipResult = {
+      bahnhof: selectedStation,
+      next_train: {
+        train_name: `ICE ${Math.floor(Math.random() * 900) + 100}`,
+        train_id: `mock-${Date.now()}`,
+        delay: isDelayed ? Math.floor(Math.random() * 15) + 1 : 0,
+      },
+    };
+    setHistory((prev) => [result, ...prev]);
+  }, [selectedStation]);
 
   return (
-    <main>
-      <h1>bahnflip</h1>
-      <GermanyMap
-        stations={stations}
-        selected={selectedStation}
-        onSelect={setSelectedStation}
-      />{" "}
-      <form onSubmit={handleSearch}>
-        <StationInput
-          label="Station"
-          selected={selectedStation}
-          stations={stations}
-          onSelect={setSelectedStation}
-        />
-        <button type="submit" disabled={!selectedStation}>
-          Search
-        </button>
-      </form>
-      {error && <p>{error}</p>}
-      {flipResult && <p>Result: {flipResult.bahnhof.bhf_name}</p>}
-      {/* <NetworkMap stations={stations} selected={selectedStation} onSelect={setSelectedStation} /> */}
-    </main>
+    <>
+      <Header onAboutClick={() => setPage("about")} />
+      {page === "about" ? (
+        <AboutPage onBack={() => setPage("home")} />
+      ) : (
+        <div className="app-layout">
+          <div className="app-map">
+            <GermanyMap
+              stations={stations}
+              selected={selectedStation}
+              onSelect={setSelectedStation}
+              skipFlyRef={skipFlyRef}
+            />
+            <MapSearchOverlay
+              stations={stations}
+              selected={selectedStation}
+              onSelect={setSelectedStation}
+            />
+          </div>
+          <div className="app-right">
+            <FlipResultCards results={history} />
+          </div>
+        </div>
+      )}
+      <Footer />
+    </>
   );
 }
 

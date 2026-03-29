@@ -1,0 +1,31 @@
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 20px;
+}
+
+.site-header__logo {
+  font-size: 28px;
+  font-weight: 900;
+  color: #ec0016;
+  letter-spacing: -0.5px;
+}
+
+.site-header__about {
+  font-size: 14px;
+  color: #9aa0a8;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.site-header__about:hover {
+  color: #131821;
+  background: #f0f3f5;
+}
