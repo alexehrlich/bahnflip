@@ -1,0 +1,23 @@
+# Dependencies
+frontend/node_modules/
+
+# Build output
+frontend/dist/
+frontend/dist-ssr/
+
+# Vite / TypeScript cache
+frontend/node_modules/.tmp/
+frontend/.vite/
+
+# Env files
+*.local
+.env
+.env.*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.sw?
