@@ -107,8 +107,6 @@ export interface components {
         TrainView: {
             /** Train Name */
             train_name: string;
-            /** Train Id */
-            train_id: string;
             /** Delay */
             delay: number;
         };

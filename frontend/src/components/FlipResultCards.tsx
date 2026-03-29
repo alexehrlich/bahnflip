@@ -1,18 +1,19 @@
 import { useState, useRef } from "react";
-import type { FlipResult } from "../types/viewmodels";
-import type { Station } from "../types/viewmodels";
+import type { FlipResult, Station } from "../types/viewmodels";
 import "./FlipResultCards.css";
 
 export interface CardState {
+  id: string;            // stable identifier used as React key
   station: Station;
-  result: FlipResult | null; // null when server error
-  error: string | null;      // set when server error
+  result: FlipResult | null;
+  error: string | null;
+  loading: boolean;      // true while API call is in-flight
   flipped: boolean;
 }
 
 interface Props {
   cards: CardState[];
-  onFlip: (trainId: string) => void;
+  onFlip: (id: string) => void;
 }
 
 export function FlipResultCards({ cards, onFlip }: Props) {
@@ -33,9 +34,9 @@ export function FlipResultCards({ cards, onFlip }: Props) {
     <div className="flip-history">
       {cards.map((card, i) => (
         <FlipCard
-          key={card.result?.next_train.train_id ?? `error-${card.station.bhf_id}`}
+          key={card.id}
           card={card}
-          onFlip={() => onFlip(card.result?.next_train.train_id ?? `error-${card.station.bhf_id}`)}
+          onFlip={() => onFlip(card.id)}
           isLatestFlipped={card.flipped && i === firstFlippedIdx}
         />
       ))}
@@ -67,9 +68,9 @@ function FlipCard({
   const [hasAnimated, setHasAnimated] = useState(false);
   const [cardHeight, setCardHeight] = useState(100);
   const cardRef = useRef<HTMLDivElement>(null);
-  const variant = resolveVariant(card);
 
   function handleClick() {
+    if (card.loading) return;
     setCardHeight(cardRef.current?.offsetHeight ?? 100);
     onFlip();
   }
@@ -77,13 +78,23 @@ function FlipCard({
   // ── Pending ────────────────────────────────────────
   if (!card.flipped) {
     return (
-      <div ref={cardRef} className="flip-card flip-card--pending" onClick={handleClick}>
+      <div
+        ref={cardRef}
+        className={[
+          "flip-card flip-card--pending",
+          card.loading ? "flip-card--loading" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        onClick={handleClick}
+      >
         <PendingCardContent card={card} />
       </div>
     );
   }
 
   // ── Animating ──────────────────────────────────────
+  const variant = resolveVariant(card);
   if (!hasAnimated) {
     return (
       <div className="flip-card-3d" style={{ height: cardHeight }}>
@@ -113,14 +124,26 @@ function FlipCard({
   );
 }
 
-// ── Pending face: same layout as result, badge + train blurred ─
+// ── Pending face ───────────────────────────────────────────────
 function PendingCardContent({ card }: { card: CardState }) {
+  if (card.loading) {
+    return (
+      <>
+        <div className="flip-card__header">
+          <div className="flip-card__loading-dots">
+            <span /><span /><span />
+          </div>
+        </div>
+        <div className="flip-card__station">{card.station.bhf_name}</div>
+        <div className="flip-card__train flip-card__train--blurred">fetching…</div>
+      </>
+    );
+  }
+
   const badgeLabel = card.result
-    ? card.result.next_train.delay > 0
-      ? "Delayed"
-      : "On Time"
+    ? card.result.next_train.delay > 0 ? "Delayed" : "On Time"
     : "●●●";
-  const trainLabel = card.result?.next_train.train_name ?? "ICE ●●●";
+  const trainLabel = card.result?.next_train.train_name ?? "●●●";
 
   return (
     <>

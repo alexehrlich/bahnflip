@@ -6,51 +6,11 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { AboutPage } from "./pages/AboutPage";
 import { fetchStations } from "./api/stationsApi";
+import { fetchFlip, FlipServerError } from "./api/flipApi";
 import type { Station } from "./types/viewmodels";
 import "leaflet/dist/leaflet.css";
 import { GermanyMap } from "./components/GermanyGeoMap";
 import "./App.css";
-
-function mockCard(station: Station): CardState {
-  const roll = Math.random();
-
-  if (roll < 0.1) {
-    // 10 %: server error
-    return { station, result: null, error: "Could not retrieve train data", flipped: false };
-  }
-
-  if (roll < 0.25) {
-    // 15 %: cancelled  (delay === -1)
-    return {
-      station,
-      result: {
-        bahnhof: station,
-        next_train: {
-          train_name: `ICE ${Math.floor(Math.random() * 900) + 100}`,
-          train_id: `mock-${Date.now()}`,
-          delay: -1,
-        },
-      },
-      error: null,
-      flipped: false,
-    };
-  }
-
-  const isDelayed = roll < 0.6; // 35 % delayed, 40 % on time
-  return {
-    station,
-    result: {
-      bahnhof: station,
-      next_train: {
-        train_name: `ICE ${Math.floor(Math.random() * 900) + 100}`,
-        train_id: `mock-${Date.now()}`,
-        delay: isDelayed ? Math.floor(Math.random() * 15) + 1 : 0,
-      },
-    },
-    error: null,
-    flipped: false,
-  };
-}
 
 function App() {
   const [page, setPage] = useState<"home" | "about">("home");
@@ -59,6 +19,7 @@ function App() {
   const [cards, setCards] = useState<CardState[]>([]);
   const [overlayDismissed, setOverlayDismissed] = useState(false);
   const skipFlyRef = useRef(false);
+  const pendingIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     fetchStations().then(setStations).catch(console.error);
@@ -66,20 +27,38 @@ function App() {
 
   useEffect(() => {
     if (!selectedStation) return;
-    const newCard = mockCard(selectedStation);
+    const id = `${selectedStation.bhf_id}-${Date.now()}`;
+    pendingIdRef.current = id;
+    const pendingCard: CardState = {
+      id,
+      station: selectedStation,
+      result: null,
+      error: null,
+      loading: true,
+      flipped: false,
+    };
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCards((prev) => [newCard, ...prev.filter((c) => c.flipped)]);
+    setCards((prev) => [pendingCard, ...prev.filter((c) => c.flipped)]);
     setOverlayDismissed(false);
+    fetchFlip(selectedStation.bhf_id)
+      .then((result) => {
+        if (pendingIdRef.current !== id) return;
+        setCards((prev) =>
+          prev.map((c) => (c.id === id ? { ...c, result, loading: false } : c)),
+        );
+      })
+      .catch((err) => {
+        if (pendingIdRef.current !== id) return;
+        const errorMsg =
+          err instanceof FlipServerError ? err.message : "Could not retrieve train data";
+        setCards((prev) =>
+          prev.map((c) => (c.id === id ? { ...c, error: errorMsg, loading: false } : c)),
+        );
+      });
   }, [selectedStation]);
 
-  function handleFlip(trainId: string) {
-    setCards((prev) =>
-      prev.map((c) =>
-        (c.result?.next_train.train_id ?? `error-${c.station.bhf_id}`) === trainId
-          ? { ...c, flipped: true }
-          : c,
-      ),
-    );
+  function handleFlip(id: string) {
+    setCards((prev) => prev.map((c) => (c.id === id ? { ...c, flipped: true } : c)));
   }
 
   const latestCard = cards[0] ?? null;
