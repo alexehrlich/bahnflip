@@ -47,3 +47,4 @@ ID_BHF_MAP = {
 BHF_ID_MAP = {v: k for k, v in ID_BHF_MAP.items()}
 
 BHF_LIST = list(BHF_ID_MAP.keys())
+ID_LIST = list(ID_BHF_MAP.keys())
