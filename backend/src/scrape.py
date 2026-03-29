@@ -2,6 +2,9 @@ import os
 import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
+BERLIN_TZ = ZoneInfo("Europe/Berlin")
 from pydantic import BaseModel
 from dataclasses import dataclass
 
@@ -25,8 +28,8 @@ HEADERS  = {
 FERNVERKEHR = {"ICE", "IC", "EC", "TGV", "RJ", "RJX"}
 
 def _parse_time(ts: str) -> datetime:
-    """YYMMDDhhmm -> datetime"""
-    return datetime.strptime(ts, "%y%m%d%H%M")
+    """YYMMDDhhmm -> timezone-aware datetime in Europe/Berlin"""
+    return datetime.strptime(ts, "%y%m%d%H%M").replace(tzinfo=BERLIN_TZ)
     
 
 def _get_station_info(ril100_code: str) -> tuple[str, str]:
@@ -50,7 +53,7 @@ def _get_last_planned_train(eva: str, time=None):
     Maybe cache because its static?!
     """
     if time is None:
-        time = datetime.now()
+        time = datetime.now(BERLIN_TZ)
 
     candidates = []
 
