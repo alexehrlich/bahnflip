@@ -7,17 +7,9 @@ from bahnhofs import BHF_LIST, NAME_MAP, BahnhofView
 
 app = FastAPI()
 
-
-class TrainView(BaseModel):
-    train_name: str
-    train_id: str
-    delay: int
-
-
 class FlipView(BaseModel):
     bahnhof: BahnhofView
     next_train: TrainView
-
 
 @app.get("/flip")
 def perform_flip(bahnhof: str | None = None) -> FlipView:
