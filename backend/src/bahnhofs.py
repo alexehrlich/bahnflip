@@ -34,7 +34,7 @@ ID_BHF_MAP = {
     "MKA": "Mü Karlsplatz",
     "MMP": "München Marienplat",
     "MOP": "München Ost Pbf",
-    "MP": "München-Pasin",
+    "MP": "München-Pasing",
     "NN": "Nürnberg Hbf",
     "RF": "Freiburg (Breisgau) Hbf",
     "RK": "Karlsruhe Hbf",
