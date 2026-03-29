@@ -1,23 +1,33 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import Fuse from "fuse.js";
+import type { Station } from "../types/station";
 
 interface Props {
   label: string;
-  value: string;
-  stations: string[];
-  onChange: (value: string) => void;
+  selected: Station | null;
+  stations: Station[];
+  onSelect: (station: Station) => void;
 }
 
-export function StationInput({ label, value, stations, onChange }: Props) {
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+export function StationInput({ label, selected, stations, onSelect }: Props) {
+  const [inputValue, setInputValue] = useState(selected?.name ?? "");
+  const [suggestions, setSuggestions] = useState<Station[]>([]);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const fuse = useMemo(() => new Fuse(stations, { threshold: 0.8 }), [stations]);
+  const fuse = useMemo(
+    () => new Fuse(stations, { keys: ["name"], threshold: 0.2 }),
+    [stations],
+  );
+
+  // Sync input text when selection changes externally (e.g. map click)
+  useEffect(() => {
+    setInputValue(selected?.name ?? "");
+  }, [selected]);
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const query = e.target.value;
-    onChange(query);
+    setInputValue(query);
 
     if (query.trim().length === 0) {
       setSuggestions([]);
@@ -30,8 +40,8 @@ export function StationInput({ label, value, stations, onChange }: Props) {
     setOpen(results.length > 0);
   }
 
-  function handleSelect(station: string) {
-    onChange(station);
+  function handleSelect(station: Station) {
+    onSelect(station);
     setSuggestions([]);
     setOpen(false);
   }
@@ -48,7 +58,7 @@ export function StationInput({ label, value, stations, onChange }: Props) {
         {label}
         <input
           type="text"
-          value={value}
+          value={inputValue}
           onChange={handleInput}
           onFocus={() => suggestions.length > 0 && setOpen(true)}
           placeholder="Station name"
@@ -59,12 +69,12 @@ export function StationInput({ label, value, stations, onChange }: Props) {
         <ul role="listbox">
           {suggestions.map((station) => (
             <li
-              key={station}
+              key={station.id}
               role="option"
-              aria-selected={station === value}
+              aria-selected={station.id === selected?.id}
               onMouseDown={() => handleSelect(station)}
             >
-              {station}
+              {station.name}
             </li>
           ))}
         </ul>
