@@ -1,4 +1,4 @@
-#https://images.ltur.com/images/pdf/bahnhofsuebersicht_fernverkehr.pdf
+# https://images.ltur.com/images/pdf/bahnhofsuebersicht_fernverkehr.pdf
 FERNVERKEHR_BHFS = [
     "Aachen Hbf",
     "Aalen Ainring",
