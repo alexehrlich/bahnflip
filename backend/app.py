@@ -1,4 +1,5 @@
 import random
+import secrets
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -15,15 +16,15 @@ class FlipView(BaseModel):
 
     @classmethod
     def random(cls, bahnhof_view: BahnhofView) -> FlipView:
-        nr = random.randint(0, 999)  # noqa: S311
-        train_view = TrainView(train_name=f"MockTrain ICE-{nr}", delay=random.choice([-1, 5, 10, 15, 60]))  # noqa: S311
+        nr = secrets.randbelow(999)
+        train_view = TrainView(train_name=f"MockTrain ICE-{nr}", delay=secrets.choice([-1, 5, 10, 15, 60]))  # noqa: S311
         return FlipView(bahnhof=bahnhof_view, next_train=train_view)
 
 
 def __mock_flip(bahnhof_view: BahnhofView) -> FlipView:
     r = random.random()  # noqa: S311
     if r < 0.1:
-        _err = random.choice([0, 1])  # noqa: S311
+        _err = secrets.choice([0, 1])
         if _err == 0:
             raise HTTPException(status_code=404, detail="Mocking 404")
         if _err == 1:
@@ -36,7 +37,7 @@ def perform_flip(bahnhof: str | None = None) -> FlipView:
 
     bahnhof_view = None
     if bahnhof is None:
-        bahnhof_view = random.choice(BHF_LIST)  # noqa: S311
+        bahnhof_view = secrets.choice(BHF_LIST)
     elif bahnhof in ID_LIST:
         bahnhof_view = ID_MAP.get(bahnhof)
     elif bahnhof in NAME_LIST:
@@ -49,9 +50,7 @@ def perform_flip(bahnhof: str | None = None) -> FlipView:
     if HEADERS["DB-Client-Id"] == "PLACEHOLDER" or HEADERS["DB-Api-Key"] == "PLACEHOLDER":
         return __mock_flip(bahnhof_view)
 
-    get_latest_train(bahnhof_view.bhf_id)
-
-    train_view = TrainView(train_name="ICE-123", delay=1)
+    train_view = get_latest_train(bahnhof_view.bhf_id)
     return FlipView(bahnhof=bahnhof_view, next_train=train_view)
 
 
