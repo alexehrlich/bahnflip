@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/alexehrlich/bahnflip/compare/v1.0.4...v1.0.5) (2026-03-29)
+
+
+### Bug Fixes
+
+* image name ([422469f](https://github.com/alexehrlich/bahnflip/commit/422469fdf3575d75bee21ce5820f67f8a2c0d01d))
+
 ## [1.0.4](https://github.com/alexehrlich/bahnflip/compare/v1.0.3...v1.0.4) (2026-03-29)
 
 
