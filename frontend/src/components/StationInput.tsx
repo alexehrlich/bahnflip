@@ -15,7 +15,10 @@ export function StationInput({ label, selected, stations, onSelect }: Props) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const fuse = useMemo(() => new Fuse(stations, { keys: ["name"], threshold: 0.2 }), [stations]);
+  const fuse = useMemo(
+    () => new Fuse(stations, { keys: ["bhf_name"], threshold: 0.4 }),
+    [stations],
+  );
 
   // Sync input text when selection changes externally (e.g. map click)
   useEffect(() => {
