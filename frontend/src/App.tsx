@@ -3,6 +3,8 @@ import { StationInput } from "./components/StationInput";
 import { fetchStations } from "./api/stationsApi";
 import { fetchFlip } from "./api/flipApi";
 import type { FlipResult, Station } from "./types/viewmodels";
+import "leaflet/dist/leaflet.css";
+import { GermanyMap } from "./components/GermanyGeoMap";
 
 function App() {
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
@@ -30,6 +32,10 @@ function App() {
   return (
     <main>
       <h1>bahnflip</h1>
+      <GermanyMap
+        stations={stations}
+        onSelect={(station) => console.log("Clicked station:", station)}
+      />
       <form onSubmit={handleSearch}>
         <StationInput
           label="Station"
