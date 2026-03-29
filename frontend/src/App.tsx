@@ -11,6 +11,47 @@ import "leaflet/dist/leaflet.css";
 import { GermanyMap } from "./components/GermanyGeoMap";
 import "./App.css";
 
+function mockCard(station: Station): CardState {
+  const roll = Math.random();
+
+  if (roll < 0.1) {
+    // 10 %: server error
+    return { station, result: null, error: "Could not retrieve train data", flipped: false };
+  }
+
+  if (roll < 0.25) {
+    // 15 %: cancelled  (delay === -1)
+    return {
+      station,
+      result: {
+        bahnhof: station,
+        next_train: {
+          train_name: `ICE ${Math.floor(Math.random() * 900) + 100}`,
+          train_id: `mock-${Date.now()}`,
+          delay: -1,
+        },
+      },
+      error: null,
+      flipped: false,
+    };
+  }
+
+  const isDelayed = roll < 0.6; // 35 % delayed, 40 % on time
+  return {
+    station,
+    result: {
+      bahnhof: station,
+      next_train: {
+        train_name: `ICE ${Math.floor(Math.random() * 900) + 100}`,
+        train_id: `mock-${Date.now()}`,
+        delay: isDelayed ? Math.floor(Math.random() * 15) + 1 : 0,
+      },
+    },
+    error: null,
+    flipped: false,
+  };
+}
+
 function App() {
   const [page, setPage] = useState<"home" | "about">("home");
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
@@ -25,31 +66,17 @@ function App() {
 
   useEffect(() => {
     if (!selectedStation) return;
-
-    const isDelayed = Math.random() > 0.5;
-    const newCard: CardState = {
-      result: {
-        bahnhof: selectedStation,
-        next_train: {
-          train_name: `ICE ${Math.floor(Math.random() * 900) + 100}`,
-          train_id: `mock-${Date.now()}`,
-          delay: isDelayed ? Math.floor(Math.random() * 15) + 1 : 0,
-        },
-      },
-      flipped: false,
-    };
-
-    setCards((prev) => {
-      const flippedOnly = prev.filter((c) => c.flipped);
-      return [newCard, ...flippedOnly];
-    });
+    const newCard = mockCard(selectedStation);
+    setCards((prev) => [newCard, ...prev.filter((c) => c.flipped)]);
     setOverlayDismissed(false);
   }, [selectedStation]);
 
   function handleFlip(trainId: string) {
     setCards((prev) =>
       prev.map((c) =>
-        c.result.next_train.train_id === trainId ? { ...c, flipped: true } : c,
+        (c.result?.next_train.train_id ?? `error-${c.station.bhf_id}`) === trainId
+          ? { ...c, flipped: true }
+          : c,
       ),
     );
   }
@@ -78,14 +105,8 @@ function App() {
               onSelect={setSelectedStation}
             />
             {showMobileOverlay && (
-              <div
-                className="mobile-card-overlay"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <FlipResultCards
-                  cards={[latestCard]}
-                  onFlip={handleFlip}
-                />
+              <div className="mobile-card-overlay" onClick={(e) => e.stopPropagation()}>
+                <FlipResultCards cards={[latestCard]} onFlip={handleFlip} />
               </div>
             )}
           </div>

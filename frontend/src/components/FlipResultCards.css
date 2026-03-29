@@ -105,8 +105,10 @@
 
 /* ── Result variants ──────────────────────── */
 
-.flip-card--on-time  { border-left-color: #00a861; }
-.flip-card--delayed  { border-left-color: #ec0016; }
+.flip-card--on-time   { border-left-color: #00a861; }
+.flip-card--delayed   { border-left-color: #ec0016; }
+.flip-card--cancelled { border-left-color: #646973; }
+.flip-card--error     { border-left-color: #f0a500; }
 
 .flip-card--latest {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
@@ -144,6 +146,17 @@
 .flip-card--delayed .flip-card__status-badge {
   background: #fde8ea;
   color: #c50014;
+}
+
+.flip-card--cancelled .flip-card__status-badge {
+  background: #ebebeb;
+  color: #3d4145;
+  text-decoration: line-through;
+}
+
+.flip-card--error .flip-card__status-badge {
+  background: #fff4d6;
+  color: #8a5c00;
 }
 
 .flip-card__delay {
