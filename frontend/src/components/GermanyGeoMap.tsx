@@ -12,6 +12,7 @@ import type { Station } from "../types/viewmodels";
 import { germanyGeoJson } from "../data/gemanyGeoJson";
 import { useEffect, useRef } from "react";
 import type { LatLngExpression, Map as LeafletMap } from "leaflet";
+import React from "react";
 
 interface Props {
   stations: Station[];
@@ -47,7 +48,7 @@ function MapCapture({ mapRef }: { mapRef: React.MutableRefObject<LeafletMap | nu
   const map = useMap();
   useEffect(() => {
     mapRef.current = map;
-  }, [map]);
+  }, [map, mapRef]);
   return null;
 }
 
@@ -55,7 +56,9 @@ function MapClickHandler({ onClick }: { onClick: () => void }) {
   const map = useMap();
   useEffect(() => {
     map.on("click", onClick);
-    return () => { map.off("click", onClick); };
+    return () => {
+      map.off("click", onClick);
+    };
   }, [map, onClick]);
   return null;
 }

@@ -20,4 +20,11 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  // Generated GeoJSON data contains high-precision floats that safely truncate at runtime
+  {
+    files: ['**/data/gemanyGeoJson.ts'],
+    rules: {
+      'no-loss-of-precision': 'off',
+    },
+  },
 ])
