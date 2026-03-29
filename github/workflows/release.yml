@@ -1,0 +1,56 @@
+name: Release a new version
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+      pull-requests: write
+    outputs:
+      released: ${{ steps.semantic-release.outputs.released }}
+      version: ${{ steps.semantic-release.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install semantic-release and plugins
+        run: npm ci
+
+      - name: Run semantic-release
+        id: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          output=$(npx semantic-release)
+          echo "$output"
+          if echo "$output" | grep -q "Published release"; then
+            echo "released=true" >> $GITHUB_OUTPUT
+            version=$(echo "$output" | sed 's/\x1b\[[0-9;]*m//g' | grep -oP "Published release \K[^ ]+")
+            echo "version=$version" >> $GITHUB_OUTPUT
+          else
+            echo "released=false" >> $GITHUB_OUTPUT
+          fi
+
+  call-publish:
+    needs: release
+    if: needs.release.outputs.released == 'true'
+    uses: ./.github/workflows/publish.yml
+    with:
+      version: ${{ needs.release.outputs.version }}
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
