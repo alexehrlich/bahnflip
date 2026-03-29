@@ -51,7 +51,7 @@ function resolveVariant(card: CardState): CardVariant {
   if (card.error) return "error";
   const delay = card.result!.next_train.delay;
   if (delay === -1) return "cancelled";
-  if (delay > 0) return "delayed";
+  if (delay >= 6) return "delayed";
   return "on-time";
 }
 
@@ -194,7 +194,7 @@ function ResultCardContent({ card, variant }: { card: CardState; variant: CardVa
         <span className="flip-card__status-badge">
           {variant === "delayed" ? "Delayed" : "On Time"}
         </span>
-        {variant === "delayed" && (
+        {delay > 0 && (
           <span className="flip-card__delay">+{delay} min</span>
         )}
       </div>
