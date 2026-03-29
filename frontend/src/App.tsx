@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { StationInput } from "./components/StationInput";
+import { NetworkMap } from "./components/NetworkMap";
 import { fetchStations } from "./api/stationsApi";
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         />
         <button type="submit">Search</button>
       </form>
+      <NetworkMap stations={stations} selected={station} onSelect={setStation} />
     </main>
   );
 }

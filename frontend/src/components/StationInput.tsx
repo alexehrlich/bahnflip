@@ -13,7 +13,7 @@ export function StationInput({ label, value, stations, onChange }: Props) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const fuse = useMemo(() => new Fuse(stations, { threshold: 0.8 }), [stations]);
+  const fuse = useMemo(() => new Fuse(stations, { threshold: 0.2 }), [stations]);
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     const query = e.target.value;
