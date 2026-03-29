@@ -22,7 +22,7 @@ function App() {
     setError(null);
     setFlipResult(null);
     try {
-      const result = await fetchFlip(selectedStation.bhf_name);
+      const result = await fetchFlip(selectedStation.bhf_id);
       setFlipResult(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -34,8 +34,9 @@ function App() {
       <h1>bahnflip</h1>
       <GermanyMap
         stations={stations}
-        onSelect={(station) => console.log("Clicked station:", station)}
-      />
+        selected={selectedStation}
+        onSelect={setSelectedStation}
+      />{" "}
       <form onSubmit={handleSearch}>
         <StationInput
           label="Station"
