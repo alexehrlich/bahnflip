@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from bahnhofs import BHF_LIST, ID_LIST, ID_MAP, NAME_LIST, NAME_MAP, BahnhofView
-from scrape import HEADERS, TrainView, get_latest_train
+from fetch_delay_data import HEADERS, TrainView, get_latest_train
 
 app = FastAPI()
 
