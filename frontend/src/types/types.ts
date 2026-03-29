@@ -11,8 +11,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Do Flip */
-        get: operations["do_flip_flip_get"];
+        /** Perform Flip */
+        get: operations["perform_flip_flip_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -79,8 +79,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Uuid */
-        get: operations["get_uuid_id_get"];
+        /** Get Id */
+        get: operations["get_id_id_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -93,10 +93,41 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** BahnhofView */
+        BahnhofView: {
+            /** Bhf Name */
+            bhf_name: string;
+            /** Bhf Id */
+            bhf_id: string;
+            /**
+             * Geo Lat
+             * @default 0
+             */
+            geo_lat: number;
+            /**
+             * Geo Lon
+             * @default 0
+             */
+            geo_lon: number;
+        };
+        /** FlipView */
+        FlipView: {
+            bahnhof: components["schemas"]["BahnhofView"];
+            next_train: components["schemas"]["TrainView"];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** TrainView */
+        TrainView: {
+            /** Train Name */
+            train_name: string;
+            /** Train Id */
+            train_id: string;
+            /** Delay */
+            delay: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -120,7 +151,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    do_flip_flip_get: {
+    perform_flip_flip_get: {
         parameters: {
             query?: {
                 bahnhof?: string | null;
@@ -137,7 +168,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["FlipView"];
                 };
             };
             /** @description Validation Error */
@@ -210,7 +241,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": string;
+                    "application/json": components["schemas"]["BahnhofView"];
                 };
             };
             /** @description Validation Error */
@@ -224,10 +255,10 @@ export interface operations {
             };
         };
     };
-    get_uuid_id_get: {
+    get_id_id_get: {
         parameters: {
             query: {
-                bahnhof: string;
+                bahnhof_name: string;
             };
             header?: never;
             path?: never;
@@ -241,7 +272,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": string;
+                    "application/json": components["schemas"]["BahnhofView"];
                 };
             };
             /** @description Validation Error */
