@@ -1,6 +1,4 @@
-import type { components } from "./types";
-
-export type FlipResult = components["schemas"]["FlipView"];
+import type { FlipResult } from "../types/viewmodels";
 
 export async function fetchFlip(stationName: string): Promise<FlipResult> {
   const response = await fetch(`/api/flip?bahnhof=${encodeURIComponent(stationName)}`);

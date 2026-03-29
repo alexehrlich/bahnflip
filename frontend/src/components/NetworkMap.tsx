@@ -1,6 +1,6 @@
 import { MAP_STATIONS, MAP_EDGES } from "../data/networkMap";
 import { GERMANY_BORDER_PATH } from "../data/germanyBorder";
-import type { Station } from "../types/station";
+import type { Station } from "../types/viewmodels";
 
 interface Props {
   stations: Station[];
@@ -63,11 +63,7 @@ export function NetworkMap({ stations, selected, onSelect }: Props) {
         const backendStation = availableByName.get(mapStation.id);
         const isSelected = selected?.name === mapStation.id;
         const isAvailable = backendStation !== undefined;
-        const markerColor = isSelected
-          ? "#0055cc"
-          : isAvailable
-            ? "#cc0000"
-            : "#999999";
+        const markerColor = isSelected ? "#0055cc" : isAvailable ? "#cc0000" : "#999999";
         const [dx, dy, anchor] = labelOffset(mapStation.anchor);
 
         return (

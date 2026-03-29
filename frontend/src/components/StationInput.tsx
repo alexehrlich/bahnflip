@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import Fuse from "fuse.js";
-import type { Station } from "../types/station";
+import type { Station } from "../types/viewmodels";
 
 interface Props {
   label: string;
@@ -10,19 +10,16 @@ interface Props {
 }
 
 export function StationInput({ label, selected, stations, onSelect }: Props) {
-  const [inputValue, setInputValue] = useState(selected?.name ?? "");
+  const [inputValue, setInputValue] = useState(selected?.bhf_name ?? "");
   const [suggestions, setSuggestions] = useState<Station[]>([]);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const fuse = useMemo(
-    () => new Fuse(stations, { keys: ["name"], threshold: 0.2 }),
-    [stations],
-  );
+  const fuse = useMemo(() => new Fuse(stations, { keys: ["name"], threshold: 0.2 }), [stations]);
 
   // Sync input text when selection changes externally (e.g. map click)
   useEffect(() => {
-    setInputValue(selected?.name ?? "");
+    setInputValue(selected?.bhf_name ?? "");
   }, [selected]);
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
@@ -69,12 +66,12 @@ export function StationInput({ label, selected, stations, onSelect }: Props) {
         <ul role="listbox">
           {suggestions.map((station) => (
             <li
-              key={station.id}
+              key={station.bhf_id}
               role="option"
-              aria-selected={station.id === selected?.id}
+              aria-selected={station.bhf_id === selected?.bhf_id}
               onMouseDown={() => handleSelect(station)}
             >
-              {station.name}
+              {station.bhf_name}
             </li>
           ))}
         </ul>

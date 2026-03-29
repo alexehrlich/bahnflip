@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { StationInput } from "./components/StationInput";
-import { NetworkMap } from "./components/NetworkMap";
 import { fetchStations } from "./api/stationsApi";
 import { fetchFlip } from "./api/flipApi";
-import type { FlipResult } from "./api/flipApi";
-import type { Station } from "./types/station";
+import type { FlipResult, Station } from "./types/viewmodels";
 
 function App() {
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
@@ -22,7 +20,7 @@ function App() {
     setError(null);
     setFlipResult(null);
     try {
-      const result = await fetchFlip(selectedStation.name);
+      const result = await fetchFlip(selectedStation.bhf_name);
       setFlipResult(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -44,8 +42,8 @@ function App() {
         </button>
       </form>
       {error && <p>{error}</p>}
-      {flipResult && <p>Result: {flipResult.bhf_name}</p>}
-      <NetworkMap stations={stations} selected={selectedStation} onSelect={setSelectedStation} />
+      {flipResult && <p>Result: {flipResult.bahnhof.bhf_name}</p>}
+      {/* <NetworkMap stations={stations} selected={selectedStation} onSelect={setSelectedStation} /> */}
     </main>
   );
 }

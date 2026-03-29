@@ -93,12 +93,26 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** FlipView */
-        FlipView: {
+        /** BahnhofView */
+        BahnhofView: {
             /** Bhf Name */
             bhf_name: string;
             /** Bhf Id */
             bhf_id: string;
+            /**
+             * Geo Lat
+             * @default 0
+             */
+            geo_lat: number;
+            /**
+             * Geo Lon
+             * @default 0
+             */
+            geo_lon: number;
+        };
+        /** FlipView */
+        FlipView: {
+            bahnhof: components["schemas"]["BahnhofView"];
             next_train: components["schemas"]["TrainView"];
         };
         /** HTTPValidationError */
@@ -227,7 +241,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": string;
+                    "application/json": components["schemas"]["BahnhofView"];
                 };
             };
             /** @description Validation Error */
@@ -244,7 +258,7 @@ export interface operations {
     get_id_id_get: {
         parameters: {
             query: {
-                bahnhof: string;
+                bahnhof_name: string;
             };
             header?: never;
             path?: never;
@@ -258,7 +272,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": string;
+                    "application/json": components["schemas"]["BahnhofView"];
                 };
             };
             /** @description Validation Error */
