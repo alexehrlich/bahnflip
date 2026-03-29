@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useState } from "react";
 
 function App() {
-  const [station, setStation] = useState('')
+  const [station, setStation] = useState("");
 
   function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
+    e.preventDefault();
     // TODO: fetch departures for `station` from backend
-    console.log('searching for:', station)
+    console.log("searching for:", station);
   }
 
   return (
@@ -17,13 +17,13 @@ function App() {
           type="text"
           placeholder="Enter station name"
           value={station}
-          onChange={e => setStation(e.target.value)}
+          onChange={(e) => setStation(e.target.value)}
           aria-label="Station"
         />
         <button type="submit">Search</button>
       </form>
     </main>
-  )
+  );
 }
 
-export default App
+export default App;
