@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/alexehrlich/bahnflip/compare/v1.0.1...v1.0.2) (2026-03-29)
+
+
+### Bug Fixes
+
+* dockerhub login ([5a2501d](https://github.com/alexehrlich/bahnflip/commit/5a2501de60876b62476e0ec8fc54dcc7a6b2aa6e))
+
 ## [1.0.1](https://github.com/alexehrlich/bahnflip/compare/v1.0.0...v1.0.1) (2026-03-29)
 
 
