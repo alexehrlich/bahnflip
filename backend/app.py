@@ -1,9 +1,8 @@
 import random
-from uuid import UUID
 
 from fastapi import FastAPI, HTTPException
 
-from bahnhofs import BHFS_LIST, ID_BHF_MAP, BHF_ID_MAP
+from bahnhofs import BHF_ID_MAP, BHF_LIST, ID_BHF_MAP
 
 app = FastAPI()
 
@@ -12,7 +11,7 @@ app = FastAPI()
 def do_flip(bahnhof: str | None = None):
 
     if bahnhof is None:
-        bahnhof = random.choice(BHFS_LIST)  # noqa: S311
+        bahnhof = random.choice(BHF_LIST)  # noqa: S311
 
     # TODO scrape delays for given bahnhof
 
@@ -22,26 +21,26 @@ def do_flip(bahnhof: str | None = None):
 @app.get("/list")
 def get_list() -> list[str]:
 
-    return BHFS_LIST
+    return BHF_LIST
 
 
 @app.get("/map")
-def get_map() -> dict[UUID, str]:
+def get_map() -> dict[str, str]:
 
     return ID_BHF_MAP
 
 
 
 @app.get("/bhf")
-def get_bhf(uuid: UUID) -> str:
-    bahnhof = ID_BHF_MAP.get(uuid)
+def get_bhf(bahnhof_id: str) -> str:
+    bahnhof = ID_BHF_MAP.get(bahnhof_id)
     if bahnhof is None:
-        raise HTTPException(status_code=404, detail=f"ID '{uuid}' not present!")
+        raise HTTPException(status_code=404, detail=f"ID '{bahnhof_id}' not present!")
     return bahnhof
 
-@app.get("/uuid")
-def get_uuid(bahnhof: str) -> UUID:
-    uuid= BHF_ID_MAP.get(bahnhof)
-    if uuid is None:
+@app.get("/id")
+def get_uuid(bahnhof: str) -> str:
+    bahnhof_id= BHF_ID_MAP.get(bahnhof)
+    if bahnhof_id is None:
         raise HTTPException(status_code=404, detail=f"Bahnhof '{bahnhof}' not present!")
-    return uuid
+    return bahnhof_id
