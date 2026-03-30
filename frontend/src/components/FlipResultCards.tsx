@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { FlipResult, Station } from "../types/viewmodels";
 import "./FlipResultCards.css";
 
@@ -32,14 +33,37 @@ export function FlipResultCards({ cards, onFlip }: Props) {
 
   return (
     <div className="flip-history">
-      {cards.map((card, i) => (
-        <FlipCard
-          key={card.id}
-          card={card}
-          onFlip={() => onFlip(card.id)}
-          isLatestFlipped={card.flipped && i === firstFlippedIdx}
-        />
-      ))}
+      <AnimatePresence initial={false} custom={undefined}>
+        {cards.map((card, i) => (
+          <motion.div
+            key={card.id}
+            layout
+            custom={card.flipped}
+            variants={{
+              initial: { opacity: 0, y: -20, scale: 0.95 },
+              animate: { opacity: 1, y: 0, scale: 1 },
+              exit: (flipped: boolean) => ({
+                opacity: 0,
+                x: flipped ? 60 : -60,
+                scale: 0.9,
+                transition: flipped
+                  ? { type: "spring", stiffness: 300, damping: 28 }
+                  : { duration: 0.16, ease: "easeIn" },
+              }),
+            }}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+          >
+            <FlipCard
+              card={card}
+              onFlip={() => onFlip(card.id)}
+              isLatestFlipped={card.flipped && i === firstFlippedIdx}
+            />
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
@@ -98,14 +122,19 @@ function FlipCard({
   if (!hasAnimated) {
     return (
       <div className="flip-card-3d" style={{ height: cardHeight }}>
-        <div className="flip-card-3d__inner" onAnimationEnd={() => setHasAnimated(true)}>
+        <motion.div
+          className="flip-card-3d__inner"
+          animate={{ rotateY: -180 }}
+          transition={{ type: "tween", ease: [0.68, -0.55, 0.27, 1.55], duration: 0.6 }}
+          onAnimationComplete={() => setHasAnimated(true)}
+        >
           <div className="flip-card-3d__front flip-card flip-card--pending">
             <PendingCardContent card={card} />
           </div>
           <div className={`flip-card-3d__back flip-card flip-card--${variant}`}>
             <ResultCardContent card={card} variant={variant} />
           </div>
-        </div>
+        </motion.div>
       </div>
     );
   }
