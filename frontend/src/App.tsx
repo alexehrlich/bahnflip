@@ -5,7 +5,6 @@ import { MapSearchOverlay } from "./components/MapSearchOverlay";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { AboutPage } from "./pages/AboutPage";
-import { AnimationTestPage } from "./pages/AnimationTestPage";
 import { fetchStations } from "./api/stationsApi";
 import { fetchFlip, FlipServerError } from "./api/flipApi";
 import type { Station } from "./types/viewmodels";
@@ -14,7 +13,7 @@ import { GermanyMap } from "./components/GermanyGeoMap";
 import "./App.css";
 
 function App() {
-  const [page, setPage] = useState<"home" | "about" | "lab">("home");
+  const [page, setPage] = useState<"home" | "about">("home");
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
   const [stations, setStations] = useState<Station[]>([]);
   const [cards, setCards] = useState<CardState[]>([]);
@@ -67,11 +66,9 @@ function App() {
 
   return (
     <>
-      <Header onAboutClick={() => setPage("about")} onLabClick={() => setPage("lab")} />
+      <Header onAboutClick={() => setPage("about")} />
       {page === "about" ? (
         <AboutPage onBack={() => setPage("home")} />
-      ) : page === "lab" ? (
-        <AnimationTestPage onBack={() => setPage("home")} />
       ) : (
         <div className="app-layout">
           <div className="app-map">
