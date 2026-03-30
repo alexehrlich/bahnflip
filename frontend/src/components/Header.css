@@ -47,6 +47,12 @@
   font-weight: 400;
 }
 
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .site-header__about {
   font-size: 14px;
   color: #9aa0a8;

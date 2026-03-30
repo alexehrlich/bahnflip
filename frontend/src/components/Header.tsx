@@ -2,9 +2,10 @@ import "./Header.css";
 
 interface Props {
   onAboutClick: () => void;
+  onLabClick: () => void;
 }
 
-export function Header({ onAboutClick }: Props) {
+export function Header({ onAboutClick, onLabClick }: Props) {
   return (
     <header className="site-header">
       <div className="site-header__brand">
@@ -16,9 +17,14 @@ export function Header({ onAboutClick }: Props) {
           </span>
         </div>
       </div>
-      <button className="site-header__about" onClick={onAboutClick}>
-        About
-      </button>
+      <nav className="site-header__nav">
+        <button className="site-header__about" onClick={onLabClick}>
+          Lab
+        </button>
+        <button className="site-header__about" onClick={onAboutClick}>
+          About
+        </button>
+      </nav>
     </header>
   );
 }
