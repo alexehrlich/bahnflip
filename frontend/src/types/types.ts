@@ -72,6 +72,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/geo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Geo */
+        get: operations["get_geo_geo_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -97,6 +114,15 @@ export interface components {
         FlipView: {
             bahnhof: components["schemas"]["BahnhofView"];
             next_train: components["schemas"]["TrainView"];
+        };
+        /** GeoView */
+        GeoView: {
+            /** Bhf Id */
+            bhf_id: string;
+            /** Geo Lat */
+            geo_lat: number;
+            /** Geo Lon */
+            geo_lon: number;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -232,6 +258,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BahnhofView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_geo_geo_get: {
+        parameters: {
+            query: {
+                bhf_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GeoView"];
                 };
             };
             /** @description Validation Error */

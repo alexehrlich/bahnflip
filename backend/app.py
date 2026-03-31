@@ -1,13 +1,24 @@
+import logging
 import random
 import secrets
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from bahnhofs import BHF_LIST, ID_LIST, ID_MAP, NAME_LIST, NAME_MAP, BahnhofView
+from bahnhofs import BHF_LIST, ID_MAP, NAME_MAP, BahnhofView
 from fetch_delay_data import HEADERS, TrainView, get_latest_train
+from geo_service import lookup_geo
+
+
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
+
+
+class GeoView(BaseModel):
+    bhf_id: str
+    geo_lat: float
+    geo_lon: float
 
 
 class FlipView(BaseModel):
@@ -38,10 +49,10 @@ def perform_flip(bahnhof: str | None = None) -> FlipView:
     bahnhof_view = None
     if bahnhof is None:
         bahnhof_view = secrets.choice(BHF_LIST)
-    elif bahnhof in ID_LIST:
-        bahnhof_view = ID_MAP.get(bahnhof)
-    elif bahnhof in NAME_LIST:
-        bahnhof_view = NAME_MAP.get(bahnhof)
+    elif bahnhof in ID_MAP:
+        bahnhof_view = ID_MAP[bahnhof]
+    elif bahnhof in NAME_MAP:
+        bahnhof_view = NAME_MAP[bahnhof]
 
     if bahnhof_view is None:
         raise HTTPException(status_code=404, detail=f"Bahnhof '{bahnhof}' not found!")
@@ -79,4 +90,13 @@ def get_id(bahnhof_name: str) -> BahnhofView:
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
     return view
+
+
+@app.get("/geo")
+def get_geo(bhf_id: str) -> GeoView:
+    try:
+        lat, lon = lookup_geo(bhf_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+    return GeoView(bhf_id=bhf_id, geo_lat=lat, geo_lon=lon)
 
