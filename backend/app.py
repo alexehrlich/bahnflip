@@ -1,4 +1,5 @@
 import logging
+import os
 import random
 import secrets
 
@@ -58,7 +59,8 @@ def perform_flip(bahnhof: str | None = None) -> FlipView:
         raise HTTPException(status_code=404, detail=f"Bahnhof '{bahnhof}' not found!")
 
     # Mocking
-    if HEADERS["DB-Client-Id"] == "PLACEHOLDER" or HEADERS["DB-Api-Key"] == "PLACEHOLDER":
+    dev_mode = os.environ.get("DEV_MODE", "false").lower() == "true"
+    if dev_mode or HEADERS["DB-Client-Id"] == "PLACEHOLDER" or HEADERS["DB-Api-Key"] == "PLACEHOLDER":
         return __mock_flip(bahnhof_view)
 
     try:
