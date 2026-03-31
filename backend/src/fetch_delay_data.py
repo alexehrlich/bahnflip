@@ -2,7 +2,14 @@ import os
 import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
+from pathlib import Path
 from zoneinfo import ZoneInfo
+
+from dotenv import load_dotenv
+
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(_BACKEND_DIR / ".env")
+load_dotenv(_BACKEND_DIR / ".env.local", override=True)
 
 BERLIN_TZ = ZoneInfo("Europe/Berlin")
 from pydantic import BaseModel
@@ -20,8 +27,8 @@ class TrainView(BaseModel):
 
 BASE_URL = "https://apis.deutschebahn.com/db-api-marketplace/apis/timetables/v1"
 HEADERS  = {
-    "DB-Client-Id": "PLACEHOLDER",
-    "DB-Api-Key":   "PLACEHOLDER",
+    "DB-Client-Id": os.environ.get("DB_CLIENT_ID", "PLACEHOLDER"),
+    "DB-Api-Key":   os.environ.get("DB_API_KEY", "PLACEHOLDER"),
     "accept":       "application/xml",
 }
 
